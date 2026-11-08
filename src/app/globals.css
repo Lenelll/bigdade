@@ -1,26 +1,322 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* ------------------------------------------------------------------
+   Design tokens — measured from the artist's portfolio.
+   Black grain + lime paper + Adinkra edge pattern is the artist system.
+   ------------------------------------------------------------------ */
+@theme {
+  --color-ink: #0f0f0f;
+  --color-ink-soft: #1c1c1c;
+  --color-ink-mute: #3a3a36;
+  /* The artist's yellow, sampled from the Dade Tse backdrop file. */
+  --color-lime: #ffdd30;
+  --color-lime-bright: #ffe766;
+  --color-lime-deep: #e9c51c;
+  --color-paper: #f3f3f3;
+  --color-paper-deep: #e4e4e2;
+  --color-on-lime: #17151a;
+  --color-signal: #d61321; /* sparing accent, from the competition pages */
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --font-display: var(--font-warxer), Impact, "Arial Narrow", sans-serif;
+  --font-sans: var(--font-myriad), "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-cond: var(--font-myriad-cond), "Arial Narrow", sans-serif;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  --radius-card: 0.125rem;
+
+  --shadow-polaroid: 0 1px 2px rgb(0 0 0 / 0.18), 0 14px 32px -12px rgb(0 0 0 / 0.45);
+  --shadow-polaroid-lift: 0 2px 4px rgb(0 0 0 / 0.2), 0 24px 48px -16px rgb(0 0 0 / 0.55);
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-marquee: marquee 40s linear infinite;
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ------------------------------------------------------------------
+   Section themes. Any element with data-theme re-maps the semantic
+   surface variables so components stay theme-agnostic.
+   ------------------------------------------------------------------ */
+:root,
+[data-theme="ink"] {
+  --bg: var(--color-ink);
+  --bg-elev: var(--color-ink-soft);
+  --fg: var(--color-lime);
+  --fg-strong: var(--color-lime-bright);
+  --fg-muted: color-mix(in oklab, var(--color-lime) 68%, var(--color-ink));
+  --accent: var(--color-lime);
+  --accent-fg: var(--color-ink);
+  --rule: color-mix(in oklab, var(--color-lime) 35%, transparent);
+  --pattern: color-mix(in oklab, var(--color-lime) 9%, transparent);
+  --focus: var(--color-lime-bright);
+  color-scheme: dark;
+}
+
+[data-theme="lime"] {
+  --bg: var(--color-lime);
+  --bg-elev: var(--color-lime-bright);
+  --fg: var(--color-on-lime);
+  --fg-strong: var(--color-ink);
+  --fg-muted: color-mix(in oklab, var(--color-on-lime) 70%, var(--color-lime));
+  --accent: var(--color-ink);
+  --accent-fg: var(--color-lime);
+  --rule: color-mix(in oklab, var(--color-ink) 45%, transparent);
+  --pattern: color-mix(in oklab, var(--color-ink) 7%, transparent);
+  --focus: var(--color-ink);
+  color-scheme: light;
+}
+
+[data-theme="paper"] {
+  --bg: var(--color-paper);
+  --bg-elev: #ffffff;
+  --fg: var(--color-ink);
+  --fg-strong: var(--color-ink);
+  --fg-muted: color-mix(in oklab, var(--color-ink) 62%, var(--color-paper));
+  --accent: var(--color-ink);
+  --accent-fg: var(--color-lime);
+  --rule: color-mix(in oklab, var(--color-ink) 18%, transparent);
+  --pattern: color-mix(in oklab, var(--color-ink) 5%, transparent);
+  --focus: var(--color-ink);
+  color-scheme: light;
+}
+
+/* Expose the semantic variables to Tailwind utilities (bg-surface, text-fg …). */
+@theme inline {
+  --color-surface: var(--bg);
+  --color-surface-elev: var(--bg-elev);
+  --color-fg: var(--fg);
+  --color-fg-strong: var(--fg-strong);
+  --color-fg-muted: var(--fg-muted);
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+  --color-rule: var(--rule);
+}
+
+@layer base {
+  * {
+    border-color: var(--rule);
+  }
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    font-feature-settings: "kern" 1, "liga" 1;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection {
+    background: var(--accent);
+    color: var(--accent-fg);
+  }
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+  }
+  img,
+  video {
+    display: block;
+    max-width: 100%;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* Expressive display type: Warxer, upper-case by default. Line height sits
+     above 1 so stacked lines read as separate lines, not one block. Tailwind's
+     text-* utilities set line-height from --tw-leading, so the value is set
+     through that variable too; leading-* utilities can still override it. */
+  .display {
+    font-family: var(--font-display);
+    font-weight: 400;
+    --tw-leading: 1.2;
+    line-height: 1.2;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    text-wrap: balance;
+  }
+
+  /* Condensed eyebrow label. */
+  .eyebrow {
+    font-family: var(--font-cond);
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+  }
+
+  /* Grainy paper/charcoal texture, as in the portfolio backgrounds. */
+  .grain {
+    position: relative;
+    isolation: isolate;
+  }
+  .grain::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.16;
+    mix-blend-mode: multiply;
+    background-image: url("/pattern/grain.svg");
+    background-size: 220px 220px;
+  }
+  [data-theme="ink"] .grain::before,
+  .grain[data-theme="ink"]::before {
+    mix-blend-mode: screen;
+    opacity: 0.09;
+  }
+
+  /* Adinkra symbols running down both edges, tonal on the background.
+     Drawn on ::after as two mask layers (left strip, mirrored right strip)
+     so it never shares a pseudo-element with .grain::before. */
+  .adinkra-edges {
+    position: relative;
+    isolation: isolate;
+    --edge-w: clamp(44px, 7vw, 120px);
+  }
+  .adinkra-edges::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-color: var(--pattern);
+    -webkit-mask-image: url("/pattern/adinkra-strip.svg"), url("/pattern/adinkra-strip-mirror.svg");
+    mask-image: url("/pattern/adinkra-strip.svg"), url("/pattern/adinkra-strip-mirror.svg");
+    -webkit-mask-size: var(--edge-w) auto, var(--edge-w) auto;
+    mask-size: var(--edge-w) auto, var(--edge-w) auto;
+    -webkit-mask-position: -6px 0, calc(100% + 6px) 0;
+    mask-position: -6px 0, calc(100% + 6px) 0;
+    -webkit-mask-repeat: repeat-y, repeat-y;
+    mask-repeat: repeat-y, repeat-y;
+  }
+
+  /* Tilted polaroid card used for every photo in the portfolio. */
+  .polaroid {
+    --tilt: 0deg;
+    background: #fff;
+    padding: 0.5rem 0.5rem 0.75rem;
+    box-shadow: var(--shadow-polaroid);
+    transform: rotate(var(--tilt));
+    transition:
+      transform 0.6s var(--ease-out-expo),
+      box-shadow 0.6s var(--ease-out-expo);
+    will-change: transform;
+  }
+  .polaroid:hover,
+  .polaroid:focus-within {
+    transform: rotate(0deg) translateY(-4px) scale(1.015);
+    box-shadow: var(--shadow-polaroid-lift);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .polaroid:hover,
+    .polaroid:focus-within {
+      transform: rotate(var(--tilt));
+    }
+  }
+
+  /* Thin rule with the footer-caption feel from the portfolio pages. */
+  .hairline {
+    border-top: 1px solid var(--rule);
+  }
+
+  /* Button styles. */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding: 0.5rem 1.25rem;
+    font-family: var(--font-cond);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    border: 1.5px solid currentColor;
+    border-radius: 999px;
+    transition:
+      background-color 0.2s,
+      color 0.2s,
+      transform 0.2s;
+  }
+  .btn:active {
+    transform: translateY(1px);
+  }
+  .btn-solid {
+    background: var(--accent);
+    color: var(--accent-fg);
+    border-color: var(--accent);
+  }
+  .btn-solid:hover {
+    background: color-mix(in oklab, var(--accent) 86%, var(--bg));
+  }
+  .btn-outline {
+    color: var(--fg-strong);
+  }
+  .btn-outline:hover {
+    background: var(--accent);
+    color: var(--accent-fg);
+    border-color: var(--accent);
+  }
+  .btn[aria-disabled="true"],
+  .btn:disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  /* Marquee strip used for the hero ticker. */
+  .marquee {
+    display: flex;
+    width: max-content;
+    animation: var(--animate-marquee);
+  }
+  .marquee:hover,
+  .marquee:focus-within {
+    animation-play-state: paused;
+  }
+  /* Illustrations: slow continuous drift; scrollable again when motion is reduced. */
+  .marquee-slow {
+    animation-duration: 90s;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-viewport {
+      overflow-x: auto;
+      scrollbar-width: thin;
+    }
+    .marquee-viewport .marquee {
+      animation: none;
+    }
+    .marquee-viewport [data-marquee-copy="1"] {
+      display: none;
+    }
+  }
+}
+
+@utility text-balance {
+  text-wrap: balance;
+}
+@utility text-pretty {
+  text-wrap: pretty;
 }
