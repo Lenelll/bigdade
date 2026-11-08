@@ -1,36 +1,62 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Quartey Bigland — artist site & shop
 
-## Getting Started
+Portfolio-first website for mural artist and graffiti writer Quartey Bigland, with a
+shop (own backend, Phase 4) and a reserved slot for the future interactive 3D "Dade Tse" character.
 
-First, run the development server:
+Stack: Next.js 16 (App Router, Cache Components), React 19, Tailwind CSS 4, `motion`.
+Phase 4 adds an Express + MongoDB API with Paystack checkout; see `docs/phase-4-backend-plan.md`.
+
+## Run
 
 ```bash
+npm install
+cp .env.example .env.local   # Phase 4 API variables are commented out until the backend exists
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The shop (`/shop`) and cart currently render a "coming soon" state. The product, collection
+and cart UI components are kept in `src/components/commerce/` for Phase 4 but are not mounted.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Where things live
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Path | What |
+| --- | --- |
+| `src/content/` | Artist, mural, illustration and character content transcribed from the 2026 portfolio PDF. **Only add text that the artist has supplied.** |
+| `src/content/artwork-manifest.json` | Generated: size + blur placeholder for every image in `public/artwork/`. |
+| `public/artwork/` | Artwork extracted from the portfolio PDF (murals, illustrations, portrait). |
+| `public/pattern/` | Adinkra symbol strip (SVG, `currentColor`) and grain texture used by the section backgrounds. |
+| `src/fonts/` + `src/lib/fonts.ts` | Warxer (display) and Myriad Pro (text/condensed) via `next/font/local`. |
+| `src/app/globals.css` | Design tokens and the three section themes: `ink`, `lime`, `paper`. |
+| `src/components/ui/` | `Section` (themed band), `Polaroid`, `ScribbleArrow`, `Reveal`. |
+| `src/components/sections/` | Home-page sections and the mural spread. |
+| `src/components/character/` | `Character3D` integration point, placeholder, and the Phase 5 scene stub. |
+| `src/components/commerce/` | Cart provider/drawer, product card/grid/gallery/purchase UI. |
+| `src/lib/commerce/` | Backend-neutral domain types (`Product`, `Cart`, …) and the shop category list. The API client arrives in Phase 4. |
 
-## Learn More
+## Routes
 
-To learn more about Next.js, take a look at the following resources:
+`/` · `/murals` · `/dade-tse` · `/shop` (coming soon) · `/cart` (redirects to `/shop`)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Phase 4 restores `/shop/[collection]`, `/products/[handle]`, `/cart`, and adds `/checkout` and `/orders/[reference]`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Shop categories live in `src/lib/commerce/config.ts`: `prints`, `merchandise`, `canvas-works`.
+Murals are commissioned, not sold. Products tagged `dade-tse` will appear on the character page.
 
-## Deploy on Vercel
+## Theming
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Wrap any block in `<Section theme="ink" | "lime" | "paper">`. The `data-theme`
+attribute remaps the semantic variables (`--bg`, `--fg`, `--accent`, …) so components
+never hard-code a palette. `edges` draws the Adinkra strip, `grain` adds texture.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 3D character (Phase 5)
+
+`Character3D` renders `CharacterPlaceholder` until `NEXT_PUBLIC_CHARACTER_3D=on`.
+Implement `src/components/character/character-3d-scene.tsx` with React Three Fiber
+once the GLB exists; it is dynamically imported, client-only, so it never affects
+the initial bundle until enabled.
+
+## Regenerating artwork from the PDF
+
+The extraction scripts lived in the session scratchpad; the output (`public/artwork/*`,
+`src/content/artwork-manifest.json`, `public/pattern/adinkra-*.svg`) is committed.
+Keys in `murals.ts` / `illustrations.ts` follow `<slug>-<n>`.
