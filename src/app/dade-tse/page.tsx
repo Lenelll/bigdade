@@ -24,7 +24,7 @@ export default function CharacterPage() {
   const main = artwork(character.mainImage);
 
   return (
-    <>
+    <div className="dade-tse-palette">
       {/* 1. The graffiti wordmark on the artist's own yellow backdrop. */}
       <Section
         theme="lime"
@@ -183,6 +183,6 @@ export default function CharacterPage() {
           <ShopComingSoon variant="compact" />
         </Container>
       </Section>
-    </>
+    </div>
   );
 }

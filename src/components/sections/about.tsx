@@ -14,7 +14,7 @@ export function About() {
   const portrait = artwork("artist-portrait");
   return (
     <Section theme="lime" id="about" flush aria-labelledby="about-title">
-      <Container className="grid gap-10 py-20 sm:py-24 lg:grid-cols-[minmax(0,1fr)_minmax(0,46%)] lg:gap-8 lg:py-0">
+      <Container className="grid gap-10 py-20 sm:py-24 lg:grid-cols-[minmax(0,1fr)_minmax(0,44%)] lg:gap-8 lg:py-0">
         <div className="lg:self-center lg:py-28">
           <Reveal>
             <h2 id="about-title" className="display text-6xl sm:text-7xl lg:text-8xl">
@@ -49,14 +49,16 @@ export function About() {
           </Reveal>
         </div>
 
-        {/* On large screens the column stretches to the row height and the
-            portrait covers it, anchored to the top so the head stays in frame
-            and the crop happens at the bottom, like the page edge in the PDF.
-            Negative right margins run it past the container to the viewport. */}
+        {/* Matches the PDF spread: the cut-out starts just past the middle of
+            the page, its head sits about 12% down, and it runs off the right
+            and bottom edges (the figure is ~1.2× the page height). The column
+            stretches to the row height; the image is sized from that height
+            and the section's overflow-hidden does the cropping. Negative right
+            margins run the column past the container to the viewport. */}
         <Reveal
           delay={0.15}
           distance={40}
-          className="relative lg:-mr-12 lg:min-h-[46rem] xl:-mr-[calc((100vw-80rem)/2+3rem)]"
+          className="relative lg:-mr-12 lg:min-h-[44rem] xl:-mr-[calc((100vw-80rem)/2+3rem)]"
         >
           <Image
             src={portrait.src}
@@ -64,10 +66,15 @@ export function About() {
             width={portrait.width}
             height={portrait.height}
             sizes="(min-width: 1024px) 50vw, 80vw"
-            className="mx-auto h-auto w-[min(100%,28rem)] lg:absolute lg:inset-x-0 lg:top-10 lg:bottom-0 lg:mx-0 lg:h-[calc(100%-2.5rem)] lg:w-full lg:object-cover lg:object-top"
+            className="mx-auto h-auto w-[min(100%,30rem)] lg:absolute lg:left-0 lg:top-[12%] lg:mx-0 lg:h-[130%] lg:w-auto lg:max-w-none"
           />
         </Reveal>
-        <PageCaption label="Meet the artist" className="pb-8 lg:col-span-2 lg:pb-10" />
+        {/* As on the spread, the hairline and caption run over the photo; the
+            right-hand caption turns lime where it sits on the dark figure. */}
+        <PageCaption
+          label="Meet the artist"
+          className="relative z-10 pb-8 lg:col-span-2 lg:pb-10 lg:[&>span:last-child]:text-lime"
+        />
       </Container>
     </Section>
   );

@@ -8,10 +8,10 @@
   --color-ink: #0f0f0f;
   --color-ink-soft: #1c1c1c;
   --color-ink-mute: #3a3a36;
-  /* The artist's yellow, sampled from the Dade Tse backdrop file. */
-  --color-lime: #ffdd30;
-  --color-lime-bright: #ffe766;
-  --color-lime-deep: #e9c51c;
+  /* The portfolio lime: the site-wide yellow. */
+  --color-lime: #e8e78a;
+  --color-lime-bright: #f2f1ad;
+  --color-lime-deep: #d4d262;
   --color-paper: #f3f3f3;
   --color-paper-deep: #e4e4e2;
   --color-on-lime: #17151a;
@@ -84,6 +84,15 @@
   --pattern: color-mix(in oklab, var(--color-ink) 5%, transparent);
   --focus: var(--color-ink);
   color-scheme: light;
+}
+
+/* The Dade Tse page alone uses the brighter yellow sampled from the
+   character's backdrop file. Overriding the token here re-colours every
+   lime theme, utility and mix inside the page. */
+.dade-tse-palette {
+  --color-lime: #ffdd30;
+  --color-lime-bright: #ffe766;
+  --color-lime-deep: #e9c51c;
 }
 
 /* Expose the semantic variables to Tailwind utilities (bg-surface, text-fg …). */
